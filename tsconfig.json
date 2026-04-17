@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "components/portfolio/portfolio-home.jsx"  ],
+, "components/portfolio/portfolio-home.jsx", "components/portfolio/magnetic-surface.jsx", "components/portfolio/case-study-page.jsx"  ],
   "exclude": ["node_modules"]
 }

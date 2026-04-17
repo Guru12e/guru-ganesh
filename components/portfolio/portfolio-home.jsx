@@ -1,4 +1,6 @@
-import { type FormEvent, useMemo, useState } from "react";
+"use client";
+
+import { useMemo, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
   ArrowRight,
@@ -17,7 +19,6 @@ import {
   Sparkles,
   WandSparkles,
 } from "lucide-react";
-import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 import { MagneticSurface } from "./magnetic-surface";
@@ -33,6 +34,10 @@ import {
 import { SectionHeading } from "./section-heading";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { AnimatedCounter } from "@/components/animations/animated-counter";
+import { AnimatedText } from "@/components/animations/animated-text";
+import { ScrollAnimation } from "@/components/animations/scroll-animation";
+import Link from "next/link";
 
 const iconMap = {
   figma: Figma,
@@ -41,7 +46,7 @@ const iconMap = {
   react: Layers3,
   sparkles: WandSparkles,
   orbit: Orbit,
-} as const;
+};
 
 const reveal = {
   initial: { opacity: 0, y: 28 },
@@ -53,18 +58,17 @@ const reveal = {
 export function PortfolioHome() {
   const { scrollYProgress } = useScroll();
   const heroOffset = useTransform(scrollYProgress, [0, 0.18], [0, 80]);
-  const [hoveredProject, setHoveredProject] = useState<string | null>(null);
+  const [hoveredProject, setHoveredProject] = useState(null);
   const [cursor, setCursor] = useState({ x: 0, y: 0 });
 
   const activePreview = useMemo(
     () =>
-      portfolioProjects.find(
-        (project: any) => project.slug === hoveredProject,
-      ) ?? null,
+      portfolioProjects.find((project) => project.slug === hoveredProject) ??
+      null,
     [hoveredProject],
   );
 
-  const scrollToSection = (sectionId: string) => {
+  const scrollToSection = (sectionId) => {
     document.getElementById(sectionId)?.scrollIntoView({
       behavior: "smooth",
       block: "start",
@@ -72,7 +76,7 @@ export function PortfolioHome() {
     window.history.replaceState(null, "", `/#${sectionId}`);
   };
 
-  const handleContactSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleContactSubmit = (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const name = String(formData.get("name") || "");
@@ -105,7 +109,7 @@ export function PortfolioHome() {
           }}
         >
           <div
-            className={`relative h-36 overflow-hidden rounded-[1.4rem] bg-gradient-to-br ${activePreview.preview.from} ${activePreview.preview.via} ${activePreview.preview.to}`}
+            className={`relative h-36 overflow-hidden rounded-[1.4rem] bg-linear-to-br ${activePreview.preview.from} ${activePreview.preview.via} ${activePreview.preview.to}`}
           >
             <div className="absolute inset-4 rounded-[1.2rem] border border-white/25 bg-slate-950/18 backdrop-blur-xl" />
             <div className="absolute left-6 top-6 h-16 w-20 rounded-2xl border border-white/20 bg-white/18 shadow-lg backdrop-blur-xl" />
@@ -161,7 +165,10 @@ export function PortfolioHome() {
                 }}
                 className="max-w-4xl text-5xl font-semibold tracking-tight text-foreground sm:text-6xl lg:text-7xl"
               >
-                Crafting intuitive and delightful digital experiences.
+                <AnimatedText
+                  text="Crafting intuitive and delightful digital experiences."
+                  staggerDelay={0.02}
+                />
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
@@ -190,24 +197,41 @@ export function PortfolioHome() {
               className="flex flex-col gap-4 sm:flex-row"
             >
               <MagneticSurface className="w-full sm:w-auto">
-                <button
+                <motion.button
                   type="button"
                   onClick={() => scrollToSection("projects")}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-900 px-6 py-4 text-base font-semibold text-white shadow-[0_24px_60px_rgba(15,23,42,0.24)] transition-transform duration-300 hover:-translate-y-0.5 dark:bg-white dark:text-slate-950 sm:w-auto"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-900 px-6 py-4 text-base font-semibold text-white shadow-[0_24px_60px_rgba(15,23,42,0.24)] transition-all duration-300 hover:shadow-[0_30px_70px_rgba(15,23,42,0.3)] dark:bg-white dark:text-slate-950 dark:hover:shadow-[0_30px_70px_rgba(255,255,255,0.1)] sm:w-auto"
+                  whileHover={{ scale: 1.05, y: -4 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   View Projects
-                  <ArrowRight className="h-4 w-4" />
-                </button>
+                  <motion.div
+                    animate={{ x: [0, 4, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </motion.div>
+                </motion.button>
               </MagneticSurface>
               <MagneticSurface className="w-full sm:w-auto">
-                <button
+                <motion.button
                   type="button"
                   onClick={() => scrollToSection("contact")}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/12 px-6 py-4 text-base font-semibold text-foreground shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-colors duration-300 hover:bg-white/18 dark:border-white/10 dark:bg-white/6 sm:w-auto"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/12 px-6 py-4 text-base font-semibold text-foreground shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all duration-300 hover:bg-white/18 dark:border-white/10 dark:bg-white/6 sm:w-auto"
+                  whileHover={{
+                    scale: 1.05,
+                    backgroundColor: "rgba(255,255,255,0.15)",
+                  }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   Contact Me
-                  <MoveUpRight className="h-4 w-4" />
-                </button>
+                  <motion.div
+                    animate={{ y: [0, -4, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <MoveUpRight className="h-4 w-4" />
+                  </motion.div>
+                </motion.button>
               </MagneticSurface>
             </motion.div>
 
@@ -221,18 +245,26 @@ export function PortfolioHome() {
               }}
               className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
             >
-              {heroStats.map((stat) => (
-                <div
+              {heroStats.map((stat, index) => (
+                <motion.div
                   key={stat.label}
-                  className="rounded-[1.6rem] border border-white/15 bg-white/12 p-5 shadow-[0_20px_55px_rgba(15,23,42,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-white/5"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.5,
+                    delay: 0.4 + index * 0.08,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  className="rounded-2xl border border-white/15 bg-white/12 p-5 shadow-[0_20px_55px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-colors duration-300 hover:bg-white/18 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
                 >
                   <p className="text-3xl font-semibold text-foreground">
-                    {stat.value}
+                    <AnimatedCounter value={stat.value} />
                   </p>
                   <p className="mt-2 text-sm text-foreground/62">
                     {stat.label}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </motion.div>
           </motion.div>
@@ -255,7 +287,7 @@ export function PortfolioHome() {
                 <span className="h-3 w-3 rounded-full bg-emerald-400/85" />
               </div>
               <div className="mt-8 grid gap-4">
-                <div className="rounded-[1.6rem] bg-gradient-to-br from-brand/90 via-brand-soft/60 to-brand-strong/80 p-5 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]">
+                <div className="rounded-[1.6rem] bg-linear-to-br from-brand/90 via-brand-soft/60 to-brand-strong/80 p-5 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="text-sm uppercase tracking-[0.28em] text-white/70">
@@ -421,7 +453,7 @@ export function PortfolioHome() {
                   <MagneticSurface className="h-full">
                     <div className="h-full rounded-[1.8rem] border border-white/15 bg-white/12 p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-colors duration-300 hover:bg-white/18 dark:border-white/10 dark:bg-slate-950/35 dark:hover:bg-slate-950/50">
                       <div className="flex items-start justify-between gap-4">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-[1.35rem] bg-gradient-to-br from-brand to-brand-strong text-white shadow-[0_20px_40px_rgba(99,102,241,0.25)]">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-[1.35rem] bg-linear-to-br from-brand to-brand-strong text-white shadow-[0_20px_40px_rgba(99,102,241,0.25)]">
                           <Icon className="h-6 w-6" />
                         </div>
                         <span className="rounded-full bg-white/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-foreground/55 dark:bg-white/6">
@@ -496,81 +528,86 @@ export function PortfolioHome() {
                 transition={{ ...reveal.transition, delay: index * 0.08 }}
               >
                 <MagneticSurface className="h-full">
-                  <Link
-                    to={`/projects/${project.slug}`}
-                    onMouseEnter={() => setHoveredProject(project.slug)}
-                    onMouseLeave={() => setHoveredProject(null)}
-                    onMouseMove={(event) =>
-                      setCursor({ x: event.clientX, y: event.clientY })
-                    }
-                    className="group block h-full rounded-[2rem] border border-white/15 bg-white/12 p-6 shadow-[0_20px_70px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-colors duration-300 hover:bg-white/18 dark:border-white/10 dark:bg-slate-950/35 dark:hover:bg-slate-950/50"
+                  <motion.div
+                    whileHover={{ y: -4 }}
+                    transition={{ duration: 0.3 }}
                   >
-                    <div
-                      className={`relative overflow-hidden rounded-[1.7rem] bg-gradient-to-br ${project.preview.from} ${project.preview.via} ${project.preview.to} p-5 shadow-2xl ${project.preview.highlight}`}
+                    <Link
+                      href={`/projects/${project.slug}`}
+                      onMouseEnter={() => setHoveredProject(project.slug)}
+                      onMouseLeave={() => setHoveredProject(null)}
+                      onMouseMove={(event) =>
+                        setCursor({ x: event.clientX, y: event.clientY })
+                      }
+                      className="group block h-full rounded-4xl border border-white/15 bg-white/12 p-6 shadow-[0_20px_70px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-all duration-300 hover:bg-white/18 hover:shadow-[0_30px_90px_rgba(15,23,42,0.15)] dark:border-white/10 dark:bg-slate-950/35 dark:hover:bg-slate-950/50"
                     >
-                      <div className="absolute inset-4 rounded-[1.4rem] border border-white/20 bg-slate-950/12 backdrop-blur-xl" />
-                      <div className="relative z-10 flex min-h-[210px] flex-col justify-between">
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="rounded-full border border-white/20 bg-white/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-white/80">
-                            {project.category}
-                          </span>
-                          <span className="text-sm font-medium text-white/80">
-                            {project.year}
-                          </span>
-                        </div>
-                        <div className="grid gap-3 sm:grid-cols-[1.05fr_0.95fr]">
-                          <div className="rounded-[1.2rem] border border-white/16 bg-white/18 p-4 backdrop-blur-xl">
-                            <p className="text-xs uppercase tracking-[0.22em] text-white/70">
-                              Process
-                            </p>
-                            <div className="mt-3 flex flex-wrap gap-2">
-                              {project.process.map((step) => (
-                                <span
-                                  key={step}
-                                  className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white"
-                                >
-                                  {step}
-                                </span>
-                              ))}
+                      <div
+                        className={`relative overflow-hidden rounded-[1.7rem] bg-linear-to-br ${project.preview.from} ${project.preview.via} ${project.preview.to} p-5 shadow-2xl ${project.preview.highlight}`}
+                      >
+                        <div className="absolute inset-4 rounded-[1.4rem] border border-white/20 bg-slate-950/12 backdrop-blur-xl" />
+                        <div className="relative z-10 flex min-h-52.5 flex-col justify-between">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="rounded-full border border-white/20 bg-white/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-white/80">
+                              {project.category}
+                            </span>
+                            <span className="text-sm font-medium text-white/80">
+                              {project.year}
+                            </span>
+                          </div>
+                          <div className="grid gap-3 sm:grid-cols-[1.05fr_0.95fr]">
+                            <div className="rounded-[1.2rem] border border-white/16 bg-white/18 p-4 backdrop-blur-xl">
+                              <p className="text-xs uppercase tracking-[0.22em] text-white/70">
+                                Process
+                              </p>
+                              <div className="mt-3 flex flex-wrap gap-2">
+                                {project.process.map((step) => (
+                                  <span
+                                    key={step}
+                                    className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white"
+                                  >
+                                    {step}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="rounded-[1.2rem] border border-white/16 bg-white/10 p-4 backdrop-blur-xl">
+                              <p className="text-xs uppercase tracking-[0.22em] text-white/70">
+                                Outcome
+                              </p>
+                              <p className="mt-3 text-sm leading-6 text-white/85">
+                                {project.impact}
+                              </p>
                             </div>
                           </div>
-                          <div className="rounded-[1.2rem] border border-white/16 bg-white/10 p-4 backdrop-blur-xl">
-                            <p className="text-xs uppercase tracking-[0.22em] text-white/70">
-                              Outcome
-                            </p>
-                            <p className="mt-3 text-sm leading-6 text-white/85">
-                              {project.impact}
-                            </p>
-                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="mt-6 space-y-4">
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <h3 className="text-2xl font-semibold text-foreground group-hover:text-brand transition-colors duration-300">
-                          {project.title}
-                        </h3>
-                        <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-white dark:bg-white dark:text-slate-950">
-                          View case study
-                          <ArrowRight className="h-3.5 w-3.5" />
-                        </span>
-                      </div>
-                      <p className="text-base leading-7 text-foreground/68">
-                        {project.problem}
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {project.tools.map((tool) => (
-                          <span
-                            key={tool}
-                            className="rounded-full border border-white/15 bg-white/35 px-3 py-1 text-xs font-medium text-foreground/70 dark:border-white/10 dark:bg-white/6"
-                          >
-                            {tool}
+                      <div className="mt-6 space-y-4">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <h3 className="text-2xl font-semibold text-foreground group-hover:text-brand transition-colors duration-300">
+                            {project.title}
+                          </h3>
+                          <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-white dark:bg-white dark:text-slate-950">
+                            View case study
+                            <ArrowRight className="h-3.5 w-3.5" />
                           </span>
-                        ))}
+                        </div>
+                        <p className="text-base leading-7 text-foreground/68">
+                          {project.problem}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {project.tools.map((tool) => (
+                            <span
+                              key={tool}
+                              className="rounded-full border border-white/15 bg-white/35 px-3 py-1 text-xs font-medium text-foreground/70 dark:border-white/10 dark:bg-white/6"
+                            >
+                              {tool}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  </Link>
+                    </Link>
+                  </motion.div>
                 </MagneticSurface>
               </motion.div>
             ))}
@@ -592,7 +629,7 @@ export function PortfolioHome() {
               className="rounded-[2rem] border border-white/15 bg-white/12 p-8 shadow-[0_20px_70px_rgba(15,23,42,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/35"
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-[1.2rem] bg-gradient-to-br from-brand to-brand-strong text-white">
+                <div className="flex h-12 w-12 items-center justify-center rounded-[1.2rem] bg-linear-to-br from-brand to-brand-strong text-white">
                   <BrainCircuit className="h-5 w-5" />
                 </div>
                 <div>
@@ -634,12 +671,17 @@ export function PortfolioHome() {
                   key={skill.title}
                   {...reveal}
                   transition={{ ...reveal.transition, delay: index * 0.05 }}
-                  className="rounded-[1.7rem] border border-white/15 bg-white/12 p-6 backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/35"
+                  whileHover={{ scale: 1.03, y: -5 }}
+                  className="rounded-[1.7rem] border border-white/15 bg-white/12 p-6 backdrop-blur-2xl transition-all duration-300 hover:bg-white/18 hover:shadow-[0_20px_60px_rgba(15,23,42,0.12)] dark:border-white/10 dark:bg-slate-950/35 dark:hover:bg-slate-950/50"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-[1rem] bg-brand/15 text-brand dark:bg-brand/20">
+                    <motion.div
+                      className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand/15 text-brand dark:bg-brand/20"
+                      whileHover={{ rotate: 10 }}
+                      transition={{ duration: 0.3 }}
+                    >
                       <BriefcaseBusiness className="h-4 w-4" />
-                    </div>
+                    </motion.div>
                     <h3 className="text-lg font-semibold text-foreground">
                       {skill.title}
                     </h3>
@@ -689,7 +731,7 @@ export function PortfolioHome() {
                         : Dribbble;
 
                   return (
-                    <a
+                    <motion.a
                       key={link.label}
                       href={link.href}
                       target={
@@ -698,12 +740,18 @@ export function PortfolioHome() {
                       rel={
                         link.href.startsWith("http") ? "noreferrer" : undefined
                       }
-                      className="flex items-center justify-between gap-4 rounded-[1.35rem] border border-white/15 bg-white/35 px-4 py-4 transition-colors duration-300 hover:bg-white/50 dark:border-white/10 dark:bg-white/6 dark:hover:bg-white/10"
+                      whileHover={{ x: 4, scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="flex items-center justify-between gap-4 rounded-[1.35rem] border border-white/15 bg-white/35 px-4 py-4 transition-all duration-300 hover:bg-white/50 dark:border-white/10 dark:bg-white/6 dark:hover:bg-white/10"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-brand/12 text-brand dark:bg-brand/20">
+                        <motion.div
+                          className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand/12 text-brand dark:bg-brand/20"
+                          whileHover={{ scale: 1.1, rotate: 5 }}
+                          transition={{ duration: 0.3 }}
+                        >
                           <Icon className="h-4 w-4" />
-                        </div>
+                        </motion.div>
                         <div>
                           <p className="text-sm font-semibold text-foreground">
                             {link.label}
@@ -713,8 +761,13 @@ export function PortfolioHome() {
                           </p>
                         </div>
                       </div>
-                      <MoveUpRight className="h-4 w-4 text-foreground/45" />
-                    </a>
+                      <motion.div
+                        animate={{ x: [0, 4, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        <MoveUpRight className="h-4 w-4 text-foreground/45" />
+                      </motion.div>
+                    </motion.a>
                   );
                 })}
               </div>
@@ -737,7 +790,7 @@ export function PortfolioHome() {
                     id="name"
                     name="name"
                     placeholder="Your name"
-                    className="h-12 rounded-2xl border-white/15 bg-white/40 text-base placeholder:text-foreground/40 focus-visible:ring-brand dark:border-white/10 dark:bg-white/6"
+                    className="h-12 rounded-2xl border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-brand dark:border-white/15 dark:bg-white/6 dark:text-foreground dark:placeholder:text-foreground/40"
                     required
                   />
                 </div>
@@ -753,7 +806,7 @@ export function PortfolioHome() {
                     name="email"
                     type="email"
                     placeholder="you@example.com"
-                    className="h-12 rounded-2xl border-white/15 bg-white/40 text-base placeholder:text-foreground/40 focus-visible:ring-brand dark:border-white/10 dark:bg-white/6"
+                    className="h-12 rounded-2xl border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-brand dark:border-white/15 dark:bg-white/6 dark:text-foreground dark:placeholder:text-foreground/40"
                     required
                   />
                 </div>
@@ -770,7 +823,7 @@ export function PortfolioHome() {
                   id="message"
                   name="message"
                   placeholder="Tell me about your product, goals, and the experience you want to create."
-                  className="min-h-[170px] rounded-[1.5rem] border-white/15 bg-white/40 px-4 py-3 text-base placeholder:text-foreground/40 focus-visible:ring-brand dark:border-white/10 dark:bg-white/6"
+                  className="min-h-42.5 rounded-3xl border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 focus-visible:ring-brand dark:border-white/15 dark:bg-white/6 dark:text-foreground dark:placeholder:text-foreground/40"
                   required
                 />
               </div>
@@ -781,13 +834,20 @@ export function PortfolioHome() {
                   product direction.
                 </p>
                 <MagneticSurface>
-                  <button
+                  <motion.button
                     type="submit"
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_20px_50px_rgba(15,23,42,0.24)] transition-transform duration-300 hover:-translate-y-0.5 dark:bg-white dark:text-slate-950"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_20px_50px_rgba(15,23,42,0.24)] transition-all duration-300 hover:shadow-[0_25px_60px_rgba(15,23,42,0.3)] dark:bg-white dark:text-slate-950 dark:hover:shadow-[0_25px_60px_rgba(255,255,255,0.1)]"
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     Let&apos;s work together
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
+                    <motion.div
+                      animate={{ x: [0, 4, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      <ArrowRight className="h-4 w-4" />
+                    </motion.div>
+                  </motion.button>
                 </MagneticSurface>
               </div>
             </motion.form>
