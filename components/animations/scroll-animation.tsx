@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useInView } from "framer-motion";
 import { motion } from "framer-motion";
 
 interface ScrollAnimationProps {
@@ -16,42 +14,44 @@ interface ScrollAnimationProps {
     | "slide-in";
 }
 
+const defaultEase = [0.22, 1, 0.36, 1] as const;
+
 const variants = {
   fadeUp: {
     initial: { opacity: 0, y: 30 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true, amount: 0.2 },
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: defaultEase },
   },
   fadeDown: {
     initial: { opacity: 0, y: -30 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true, amount: 0.2 },
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: defaultEase },
   },
   fadeLeft: {
     initial: { opacity: 0, x: -40 },
     whileInView: { opacity: 1, x: 0 },
     viewport: { once: true, amount: 0.2 },
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: defaultEase },
   },
   fadeRight: {
     initial: { opacity: 0, x: 40 },
     whileInView: { opacity: 1, x: 0 },
     viewport: { once: true, amount: 0.2 },
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: defaultEase },
   },
   scale: {
     initial: { opacity: 0, scale: 0.95 },
     whileInView: { opacity: 1, scale: 1 },
     viewport: { once: true, amount: 0.2 },
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: defaultEase },
   },
   "slide-in": {
     initial: { opacity: 0, y: 50 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true, amount: 0.15 },
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.7, ease: defaultEase },
   },
 };
 
